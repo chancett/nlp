@@ -33,8 +33,8 @@ id_query ={
             # campaign
            # '72': '1020,1022',
            #  '168': '1144,1145'
-    '72': '1142,1022,1148,1144',
-    '168': '1492,1494'
+    '72': '1142,1022,1144,1492,1494',
+    # '168': '1492,1494'
     }
 
 id_type = {'66': 'brand',
@@ -190,20 +190,24 @@ def topic_buzz(headers, id, query, dayslist, type, pltid = '5,7,6,3,1,4,2'):
         temp['声量趋势'] = i['total_buzz']['percent']
         temp['情感值'] = i['nsr']['like']
         temp['情感值趋势'] = i['nsr']['percent']
-        temp[plat[0]['platform']] = plat[0]['total']
-        temp['%s占比' % plat[0]['platform']] = plat[0]['proportion']
-        temp[plat[1]['platform']] = plat[1]['total']
-        temp['%s占比' % plat[1]['platform']] = plat[1]['proportion']
-        temp[plat[2]['platform']] = plat[2]['total']
-        temp['%s占比' % plat[2]['platform']] = plat[2]['proportion']
-        temp[plat[3]['platform']] = plat[3]['total']
-        temp['%s占比' % plat[3]['platform']] = plat[3]['proportion']
-        temp[plat[4]['platform']] = plat[4]['total']
-        temp['%s占比' % plat[4]['platform']] = plat[4]['proportion']
-        temp[plat[5]['platform']] = plat[5]['total']
-        temp['%s占比' % plat[5]['platform']] = plat[5]['proportion']
-        temp[plat[6]['platform']] = plat[6]['total']
-        temp['%s占比' % plat[6]['platform']] = plat[6]['proportion']
+        num = [x for x in range(len(plat))]
+        for nc in num:
+            temp[plat[nc]['platform']] = plat[nc]['total']
+            temp['%s占比' % plat[nc]['platform']] = plat[nc]['proportion']
+        # temp[plat[0]['platform']] = plat[0]['total']
+        # temp['%s占比' % plat[0]['platform']] = plat[0]['proportion']
+        # temp[plat[1]['platform']] = plat[1]['total']
+        # temp['%s占比' % plat[1]['platform']] = plat[1]['proportion']
+        # temp[plat[2]['platform']] = plat[2]['total']
+        # temp['%s占比' % plat[2]['platform']] = plat[2]['proportion']
+        # temp[plat[3]['platform']] = plat[3]['total']
+        # temp['%s占比' % plat[3]['platform']] = plat[3]['proportion']
+        # temp[plat[4]['platform']] = plat[4]['total']
+        # temp['%s占比' % plat[4]['platform']] = plat[4]['proportion']
+        # temp[plat[5]['platform']] = plat[5]['total']
+        # temp['%s占比' % plat[5]['platform']] = plat[5]['proportion']
+        # temp[plat[6]['platform']] = plat[6]['total']
+        # temp['%s占比' % plat[6]['platform']] = plat[6]['proportion']
         temp['互动量'] = i['engagement']['total']
         temp['互动量趋势'] = i['engagement']['percent']
         temp[topic_list[0]['topic']] = topic_list[0]['total']
@@ -262,9 +266,46 @@ def DetailTopic(headers, id, query, dayslist, pltid ='5,7,6,3,1,4,2'):
                 rnm['3级属性总量'] = third_num
                 rnm['query'] = query
                 rnm['pltid'] = str(pltid)
-                print(rnm)
+                # print(rnm)
 
                 df = df.append(pd.DataFrame(rnm))
+    return df
+
+def DetailTopicFran(headers, id, query, dayslist, pltid ='5,7,6,3,1,4,2'):
+    url = 'https://sl.cn-siit.com/postDetail'
+    form_data = {
+        'dashboardType': '0',
+        'id': str(id),
+        'type': '2',
+        'beginTime': dayslist[0],
+        'platformId': str(pltid),
+        # 可变日期
+        'endTime': dayslist[-1],
+        'query': str(query)
+    }
+    rq = requests.post(url, data=form_data, headers=headers)
+    # print(form_data)
+    cao = rq.content.decode()
+    cnm = json.loads(cao)['page']['topic_a_data']['topic_list']
+    df = pd.DataFrame()
+    # print(cnm)
+    for i in cnm:
+        first_name = i['topic']
+        first_num = i['total']
+        # 2级属性
+        second_plat = i['topic_sub_list']
+        for s in second_plat:
+            second_name = s['topic']
+            second_num = s['total']
+            #3级属性
+            rnm = {}
+            rnm['1级属性'] = [first_name]
+            rnm['1级属性总量'] = first_num
+            rnm['2级属性'] = second_name
+            rnm['2级属性总量'] = second_num
+            rnm['query'] = query
+            rnm['pltid'] = str(pltid)
+            df = df.append(pd.DataFrame(rnm))
     return df
 
 # franchise 首页表现
@@ -295,20 +336,25 @@ def get_fran_topic(headers, id, query, dayslist, type, pltid = '5,7,6,3,1,4,2'):
         temp['情感值'] = i['nsr']['like']
         temp['情感值趋势'] = i['nsr']['percent']
 
-        temp[plat[0]['platform']] = plat[0]['total']
-        temp['%s占比' % plat[0]['platform']] = plat[0]['proportion']
-        temp[plat[1]['platform']] = plat[1]['total']
-        temp['%s占比' % plat[1]['platform']] = plat[1]['proportion']
-        temp[plat[2]['platform']] = plat[2]['total']
-        temp['%s占比' % plat[2]['platform']] = plat[2]['proportion']
-        temp[plat[3]['platform']] = plat[3]['total']
-        temp['%s占比' % plat[3]['platform']] = plat[3]['proportion']
-        temp[plat[4]['platform']] = plat[4]['total']
-        temp['%s占比' % plat[4]['platform']] = plat[4]['proportion']
-        temp[plat[5]['platform']] = plat[5]['total']
-        temp['%s占比' % plat[5]['platform']] = plat[5]['proportion']
-        temp[plat[6]['platform']] = plat[6]['total']
-        temp['%s占比' % plat[6]['platform']] = plat[6]['proportion']
+        num = [x for x in range(len(plat))]
+
+        for nc in num:
+            temp[plat[nc]['platform']] = plat[nc]['total']
+            temp['%s占比' % plat[nc]['platform']] = plat[nc]['proportion']
+            # temp[plat[0]['platform']] = plat[0]['total']
+            # temp['%s占比' % plat[0]['platform']] = plat[0]['proportion']
+            # temp[plat[1]['platform']] = plat[1]['total']
+            # temp['%s占比' % plat[1]['platform']] = plat[1]['proportion']
+            # temp[plat[2]['platform']] = plat[2]['total']
+            # temp['%s占比' % plat[2]['platform']] = plat[2]['proportion']
+            # temp[plat[3]['platform']] = plat[3]['total']
+            # temp['%s占比' % plat[3]['platform']] = plat[3]['proportion']
+            # temp[plat[4]['platform']] = plat[4]['total']
+            # temp['%s占比' % plat[4]['platform']] = plat[4]['proportion']
+            # temp[plat[5]['platform']] = plat[5]['total']
+            # temp['%s占比' % plat[5]['platform']] = plat[5]['proportion']
+            # temp[plat[6]['platform']] = plat[6]['total']
+            # temp['%s占比' % plat[6]['platform']] = plat[6]['proportion']
         temp['type'] = type
         for i in range(9):
             temp[topic_list[i]['topic']] = topic_list[i]['total']
@@ -428,6 +474,22 @@ def fran_topic(franTopic):
         product_topic['{}_Pct'.format(col)] = list(map(lambda x, y: float(x/y), product_topic[col], product_topic['topic_sum']))
     return product_topic
 
+def fran_topic_detail(franTopic):
+    product_topic = franTopic[
+        ['name', 'Sizing', 'Design', 'Price', 'Quality', 'Authenticity', 'Material', 'Flexibility',
+         'Fitting', 'Comfort']]
+    product_topic = product_topic.fillna(0)
+    for col in ['Sizing', 'Design', 'Price', 'Quality', 'Authenticity', 'Material', 'Flexibility', 'Fitting', 'Comfort']:
+        product_topic[col] = product_topic[col].fillna(0)
+        product_topic[col] = product_topic[col].astype(int)
+    product_topic['topic_sum'] = list(map(lambda a, b, c, d, e, f, g, h, i: int(a)+int(b)+int(c)+int(d)+int(e)+int(f)+int(g)+int(h)+int(i),
+                                          product_topic['Sizing'], product_topic['Design'],product_topic['Price'],product_topic['Quality'],
+                                          product_topic['Authenticity'],product_topic['Material'],product_topic['Flexibility'],product_topic['Fitting'],
+                                          product_topic['Comfort']))
+    for col in ['Sizing', 'Design', 'Price', 'Quality', 'Authenticity', 'Material', 'Flexibility', 'Fitting', 'Comfort']:
+        product_topic['{}_Pct'.format(col)] = list(map(lambda x, y: float(x/y) if y > 0 else 'nan', product_topic[col], product_topic['topic_sum']))
+    return product_topic
+
 
 # 输出nike, adidas, lining, anta四个品牌的到天声量
 def daily_volume_from_plt(pltDf, sheet3):
@@ -445,6 +507,24 @@ def daily_volume_from_plt(pltDf, sheet3):
     # print(dailyout.head())
     iloc_write(sheet3, dailyout, 3, 2)
 
+def sheet10_writer(product_topic, prOther, sheet10, detail_tag=False):
+    if detail_tag:
+        prTopic = product_topic.merge(prOther[['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR']],
+                                      on='name', how='inner')
+    else:
+        prTopic = product_topic.merge(prOther[['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR']],
+                                      on='name', how='inner')
+    prTopic = prTopic.sort_values(by='total', ascending=False)
+    prTopic = prTopic[
+        ['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR', 'Sizing', 'Design', 'Price', 'Quality',
+         'Authenticity', 'Material', 'Flexibility', 'Fitting', 'Comfort',
+         'Sizing_Pct', 'Design_Pct', 'Price_Pct', 'Quality_Pct', 'Authenticity_Pct', 'Material_Pct', 'Flexibility_Pct',
+         'Fitting_Pct', 'Comfort_Pct']]
+    prTopic = prTopic[~(prTopic['name'].isin(['Yeezy Boost', 'Superstar', 'UltraBOOST', 'Chuck 70', 'AlphaBounce',
+                                              'ONE STAR', 'Stan Smith', 'Chuck Taylor', '悟道ACE', 'SK8']))]
+    iloc_write(sheet10, prTopic, 3, 2)
+
+
 def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
     # queryName = pd.read_excel(r'R:\yuqing_fmcg\0_rpt_pkg\weekly_report\docs\query_id.xlsx')
     sheet1 = workbook.create_sheet('1TotalBuzz')
@@ -454,6 +534,7 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
     sheet4 = workbook.create_sheet('4ByDaySenti')
 
     sheet10 = wbFran.create_sheet("10FranKPI")
+    sheet10_1 = wbFran.create_sheet("10FranKPIDetail")
     redFill = PatternFill(start_color='FFFF00', end_color = 'FFFF00', fill_type = 'solid')
     sheet10.conditional_formatting.add('E1:E50', FormulaRule(formula=['E1=Air Jordan 1'], fill=redFill))
     sheet11 = wbFran.create_sheet('11OthersBuzz')
@@ -467,7 +548,7 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
     topicDf = pd.DataFrame()
     franTopic = pd.DataFrame()
     topicDetail = pd.DataFrame()
-
+    franTopicDetail = pd.DataFrame()
     for id, queryList in id_query.items():
         type = id_type[str(id)]
         for query in queryList.split(','):
@@ -481,11 +562,11 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
             senDf = senDf.append(sentiOpen(headers, id, query, dayslist, type, '7,6,3,1,4,2'))
             # 获取首页的topic buzz
             if type == 'brand':
-                topicDf = topicDf.append(topic_buzz(headers, id, query, dayslist, type))
-                topicDetail = topicDetail.append(DetailTopic(headers, id, query, dayslist))
+                topicDf = topicDf.append(topic_buzz(headers, id, query, dayslist, type, '7'))
+                topicDetail = topicDetail.append(DetailTopic(headers, id, query, dayslist, '7'))
             if type == 'franchise':
-                franTopic = franTopic.append(get_fran_topic(headers, id, query, dayslist, type))
-
+                franTopic = franTopic.append(get_fran_topic(headers, id, query, dayslist, type, '7'))
+                franTopicDetail = franTopicDetail.append(DetailTopicFran(headers, id, query, dayslist, '7'))
 
 
     # 输出query_name对应表
@@ -497,6 +578,7 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
     pltDf = pltDf.merge(queryName, on='query', how='left')
     senDf = senDf.merge(queryName, on='query', how='left')
     topicDetail = topicDetail.merge(queryName, on='query', how='left')
+    franTopicDetail = franTopicDetail.merge(queryName, on='query', how='left')
 
     pltDf.to_excel(writer, sheet_name='plt_daily', index=False)
     df.to_excel(writer, sheet_name='daily', index=False)
@@ -504,8 +586,11 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
     topicDf.to_excel(writer, sheet_name='brand_topic', index=False)
     franTopic.to_excel(writer, sheet_name='fran_topic', index=False)
     topicDetail.to_excel(writer, sheet_name='detail_topic', index=False)
+    franTopicDetail.to_excel(writer, sheet_name='fran_detail_topic', index=False)
 
     topicDetail = topicDetail.pivot_table(index=['query', 'name'], columns='1级属性', values = '3级属性总量', aggfunc='sum').reset_index()
+    franTopicDetail = franTopicDetail.pivot_table(index=['query', 'name'], columns='1级属性', values = '2级属性总量', aggfunc='sum').reset_index()
+
     print(topicDetail.columns)
     # topicDetail = topicDetail.rename(columns={'Brand': 'Brand Reputation', 'Campaign': 'Campaign/Events', ''})
     topic_buzz_4_detail(topicDetail, sheet2_1)
@@ -515,8 +600,9 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
 
 
     # 产品kpi输出
-    product_topic = fran_topic(franTopic)
-
+    # product_topic = fran_topic(franTopic)
+    product_topic = fran_topic_detail(franTopic)
+    prDetailTopic = fran_topic_detail(franTopicDetail)
     # 到天的情感计算
     ncol = 2
     for brandName in ['Nike', 'Adidas', 'Lining', 'Anta']:
@@ -568,13 +654,15 @@ def daily_volume(id_query, dayslist, workbook, wbFran, wbCam, writer):
             prOther = prOther.sort_values(by='total', ascending=False)
             iloc_write(sheet11, prOther, 3, 2)
 
-            prTopic = product_topic.merge(prOther[['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR']], on='name', how='inner')
-            prTopic = prTopic.sort_values(by='total', ascending=False)
-            prTopic = prTopic[['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR', 'Sizing', 'Design', 'Price', 'Quality', 'Authenticity', 'Material', 'Flexibility', 'Fitting', 'Comfort',
-                               'Sizing_Pct', 'Design_Pct', 'Price_Pct', 'Quality_Pct', 'Authenticity_Pct', 'Material_Pct', 'Flexibility_Pct', 'Fitting_Pct', 'Comfort_Pct']]
-            prTopic = prTopic[~(prTopic['name'].isin(['Yeezy Boost', 'Superstar', 'UltraBOOST', 'Chuck 70', 'AlphaBounce',
-                                                    'ONE STAR', 'Stan Smith', 'Chuck Taylor', '悟道ACE', 'SK8']))]
-            iloc_write(sheet10, prTopic, 3, 2)
+            sheet10_writer(product_topic, prOther, sheet10)
+            sheet10_writer(prDetailTopic, prOther, sheet10_1)
+            # prTopic = product_topic.merge(prOther[['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR']], on='name', how='inner')
+            # prTopic = prTopic.sort_values(by='total', ascending=False)
+            # prTopic = prTopic[['name', 'total', 'total_PSR', 'social', 'social_PSR', '电商', 'ec_PSR', 'Sizing', 'Design', 'Price', 'Quality', 'Authenticity', 'Material', 'Flexibility', 'Fitting', 'Comfort',
+            #                    'Sizing_Pct', 'Design_Pct', 'Price_Pct', 'Quality_Pct', 'Authenticity_Pct', 'Material_Pct', 'Flexibility_Pct', 'Fitting_Pct', 'Comfort_Pct']]
+            # prTopic = prTopic[~(prTopic['name'].isin(['Yeezy Boost', 'Superstar', 'UltraBOOST', 'Chuck 70', 'AlphaBounce',
+            #                                         'ONE STAR', 'Stan Smith', 'Chuck Taylor', '悟道ACE', 'SK8']))]
+            # iloc_write(sheet10, prTopic, 3, 2)
             #
             # prsent = sent[sent['name'].isin(pltVol['name'].unique())].drop('type', 1)
             # iloc_write(sheet11_1, prsent, 3, 2)
@@ -607,7 +695,7 @@ def sentByTopic(id_query, dayslist, writer, wbFran):
 
 
 if __name__ =='__main__':
-    timeList = pd.date_range('2019-10-01', '2019-10-31')
+    timeList = pd.date_range('2019-12-01', '2019-12-31')
     daysList =[i.strftime("%Y-%m-%d") for i in timeList]
     # print(daysList)
     print(daysList)
@@ -617,11 +705,11 @@ if __name__ =='__main__':
     wbAll = Workbook()
     wbFran = Workbook()
     wbCam = Workbook()
-    writer = pd.ExcelWriter(os.path.join(outPath, 'Month_rpt_ref_{}.xlsx'.format(daysList[-1])))
+    writer = pd.ExcelWriter(os.path.join(outPath, 'Month_rpt_ref_{}_WB.xlsx'.format(daysList[-1])))
     daily_volume(id_query, daysList, wbAll, wbFran, wbCam, writer)
     sentByTopic(id_query, daysList, writer, wbFran)
-    wbAll.save(os.path.join(outPath, 'Nike_Mon_overall.xlsx'))
-    wbFran.save(os.path.join(outPath,'Nike_Mon_Fran.xlsx'))
-    wbCam.save(os.path.join(outPath, 'Nike_Mon_Campaign.xlsx'))
+    wbAll.save(os.path.join(outPath, 'Nike_Mon_overall_WB.xlsx'))
+    wbFran.save(os.path.join(outPath,'Nike_Mon_Fran.xlsx_WB'))
+    wbCam.save(os.path.join(outPath, 'Nike_Mon_Campaign.xlsx_WB'))
     writer.save()
 
